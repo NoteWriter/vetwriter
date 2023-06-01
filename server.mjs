@@ -8,7 +8,6 @@ import pkg from 'blob';
 const { Blob } = pkg;
 import { File } from 'formdata-node';
 import fs from 'fs/promises';
-import AWS from 'aws-sdk';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
