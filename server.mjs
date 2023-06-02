@@ -20,6 +20,10 @@ const host = process.env.HOST || 'http://localhost';
 const upload = multer({ storage: multer.memoryStorage() });
 app.use(express.json());
 
+const pgp = pgPromise({
+  /* initialization options */
+});
+
 // Configure your connection details as an object
 const connection = {
   connectionString: process.env.DATABASE_URL,
