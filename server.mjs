@@ -13,18 +13,20 @@ const __dirname = dirname(__filename);
 
 const API_KEY = process.env.OPENAI_API_KEY;
 const app = express();
+app.use(express.static('public')); // This line sets up static file serving
 const port = process.env.PORT || 3000;
 const host = process.env.HOST || 'http://localhost';
 
 const upload = multer({ storage: multer.memoryStorage() });
 app.use(express.json());
 
-const pgp = require('pg-promise')({
+const pgp = pgPromise({
   /* initialization options */
   ssl: {
     rejectUnauthorized: false
   }
 });
+
 
 const db = pgp(process.env.DATABASE_URL);
 
