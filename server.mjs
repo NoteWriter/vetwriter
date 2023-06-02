@@ -133,7 +133,7 @@ const initializeDatabase = async () => {
         id SERIAL PRIMARY KEY,
         patient_name TEXT,
         transcription TEXT,
-        reply TEXT
+        reply TEXT,
         content TEXT,
         timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
       )
