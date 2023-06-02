@@ -59,12 +59,11 @@ app.post('/whisper/asr', upload.single('audio'), async (req, res) => {
     const data = await response.json();
     console.log('Whisper API response:', JSON.stringify(data));
   
-  // Insert transcription into database
-  const transcription = data.text;
-  await db.none(
-    'INSERT INTO transcriptions(patient_name, transcription) VALUES($1, $2)',
-    [patientName, transcription]
-  );
+// Insert transcription into database with the current timestamp
+await db.none(
+  'INSERT INTO vetwriter(patient_name, transcription, timestamp) VALUES($1, $2, NOW())',
+  [patientName, transcription]
+);
   
     res.json({ transcription: transcription });
   } catch (error) {
@@ -103,10 +102,11 @@ app.post('/chatgpt', async (req, res) => {
     const data = await response.json();
     const message = data.choices && data.choices.length > 0 ? data.choices[0].message.content.trim() : '';
 
-    // Update database entry with reply
-    try {
-      await db.none('UPDATE transcriptions SET reply = $1 WHERE transcription = $2', [message, userMessage]);
-      res.json({ reply: message });
+// Update database entry with reply and content
+await db.none(
+  'UPDATE vetwriter SET reply = $1, content = $2 WHERE transcription = $3',
+  [message, requestBody.messages[1].content, userMessage]
+);
     } catch (error) {
       throw new Error('Error updating the database');
     }
@@ -114,7 +114,7 @@ app.post('/chatgpt', async (req, res) => {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
-});
+);
 
 
 app.use(express.static('public'));
@@ -130,11 +130,13 @@ app.listen(port, () => {
 const initializeDatabase = async () => {
   try {
     await db.none(`
-      CREATE TABLE IF NOT EXISTS transcriptions(
+      CREATE TABLE IF NOT EXISTS vetwriter(
         id SERIAL PRIMARY KEY,
         patient_name TEXT,
         transcription TEXT,
         reply TEXT
+        content TEXT,
+        timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
       )
     `);
     console.log("Table created successfully");
