@@ -102,11 +102,10 @@ app.post('/chatgpt', async (req, res) => {
     const data = await response.json();
     const message = data.choices && data.choices.length > 0 ? data.choices[0].message.content.trim() : '';
 
-// Update database entry with reply and content
-await db.none(
-  'UPDATE vetwriter SET reply = $1, content = $2 WHERE transcription = $3',
-  [message, requestBody.messages[1].content, userMessage]
-);
+    // Update database entry with reply and content
+    try {
+      await db.none('UPDATE vetwriter SET reply = $1, content = $2 WHERE transcription = $3', [message, requestBody.messages[1].content, userMessage]);
+      res.json({ reply: message });
     } catch (error) {
       throw new Error('Error updating the database');
     }
@@ -114,7 +113,7 @@ await db.none(
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
-);
+});
 
 
 app.use(express.static('public'));
