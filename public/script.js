@@ -5,8 +5,12 @@ const transcriptionElement = document.getElementById('transcription');
 const outputTextArea = document.getElementById('output-text');
 let recordRTC;
 
+const patientNameElement = document.getElementById('patient-name'); // New line to get the patient name element
+let patientName; // New line to declare the patient name variable
+
 const startRecording = async () => {
     try {
+        patientName = patientNameElement.value; // New line to get patient name
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
         const options = {
@@ -38,7 +42,7 @@ const stopRecording = () => {
 };
 
 const sendToWhisperAPI = async (audioBlob) => {
-  const SERVER_URL = '/whisper/asr';
+  const SERVER_URL = `/whisper/asr?patientName=${encodeURIComponent(patientName)}`;
 
   const formData = new FormData();
   formData.append('audio', audioBlob, 'audio.webm');
