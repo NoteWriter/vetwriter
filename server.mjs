@@ -19,15 +19,14 @@ const host = process.env.HOST || 'http://localhost';
 const upload = multer({ storage: multer.memoryStorage() });
 app.use(express.json());
 
-const pgp = pgPromise();
-const config = {
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD
-};
-const db = pgp(config);
+const pgp = require('pg-promise')({
+  /* initialization options */
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
+
+const db = pgp(process.env.DATABASE_URL);
 
 app.post('/whisper/asr', upload.single('audio'), async (req, res) => {
   const patientName = req.query.patientName; // Extract patient name from query parameters
