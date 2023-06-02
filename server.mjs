@@ -54,7 +54,7 @@ app.post('/whisper/asr', upload.single('audio'), async (req, res) => {
     console.log('Whisper API response:', JSON.stringify(data));
   
   // Insert transcription into database
-  const transcription = data.choices[0].transcription;
+  const transcription = data.text;
   await db.none(
     'INSERT INTO transcriptions(patient_name, transcription) VALUES($1, $2)',
     [patientName, transcription]
