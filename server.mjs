@@ -58,6 +58,8 @@ app.post('/whisper/asr', upload.single('audio'), async (req, res) => {
 
     const data = await response.json();
     console.log('Whisper API response:', JSON.stringify(data));
+
+    const transcription = data.text; // Define the transcription variable
   
 // Insert transcription into database with the current timestamp
 await db.none(
