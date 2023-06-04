@@ -65,6 +65,9 @@ const sendToWhisperAPI = async (audioBlob) => {
     } else {
       transcriptionElement.textContent = 'Transcription not available.';
     }
+
+    patientNameElement.value = '';
+
   } catch (error) {
     console.error('Error:', error);
     transcriptionElement.textContent = 'Error while transcribing.';
