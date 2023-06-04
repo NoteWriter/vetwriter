@@ -15,12 +15,13 @@
   <div class="content">
     <input type="text" id="patient-name" name="patient-name" placeholder="Patient Name">
     <div class="button-container">
-      <button id="recordButton">Start</button>
-      <button id="copyButton">Copy text</button>
-
-      <button id="downloadButton">Download .txt file</button>
+      <button id="recordButton" class="button">Start</button>
+      <button id="copyButton" class="button-other">Copy text</button>
+      <button id="downloadButton" class="button-other">Download .txt file</button>
+      
     </div>
-    <textarea id="output-text" placeholder="By clicking 'Start' you acknolwedge that you have obtained consent from your patient to release their pets' health information to NoteWriter, LLC, OpenAI, and any other entities or individuals deemed necessary by NoteWriter, LLC."></textarea>
+    <p>By clicking 'Start' you acknolwedge that you have obtained consent from your patient to release their pets' health information to NoteWriter, LLC, OpenAI, and any other entities or individuals deemed necessary by NoteWriter, LLC."</p>
+    <textarea id="output-text" placeholder="Ready to write your note for you"></textarea>
 
     <div id="transcription-box" class="transcription-box">
       <p id="transcription"></p>

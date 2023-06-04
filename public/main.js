@@ -40,7 +40,7 @@ const stopRecording = () => {
         });
 
         recordButton.textContent = 'Start';
-        recordButton.style.backgroundColor = '#40acc9';
+        recordButton.style.backgroundColor = '#BBE2EC';
     }
 };
 

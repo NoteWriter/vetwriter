@@ -43,6 +43,14 @@ button {
     margin-bottom: 2vh;
 }
 
+.button {
+    background-color: #BBE2EC;
+}
+
+.button-other {
+    background-color: #EAEBEB;
+}
+
 #output-text {
     width: 100%;
     height: calc(100% - 2em);
