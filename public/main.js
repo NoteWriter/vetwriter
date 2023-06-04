@@ -25,7 +25,7 @@ const startRecording = async () => {
         recordRTC.startRecording();
 
         recordButton.textContent = 'Stop';
-        recordButton.style.backgroundColor = #FBD5D6;
+        recordButton.style.backgroundColor = '#FBD5D6';
     } catch (err) {
         console.error('Error:', err);
     }
