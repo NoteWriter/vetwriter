@@ -101,6 +101,7 @@ body {
     font-weight: 100;
     color: #9b9b9b; 
     opacity: 1; /* Firefox */
+    font-size: medium;
 }
 
 :-ms-input-placeholder { /* Internet Explorer 10-11 */
