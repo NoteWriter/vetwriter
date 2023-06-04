@@ -22,7 +22,7 @@ body {
 
 .header {
   text-align: left;
-  margin-bottom: 2vh;
+  margin-bottom: 8vh;
 }
 
 .button-container {
@@ -31,8 +31,9 @@ body {
 }
 
 button {
-    font-size: 1.5rem;
-    padding: 1vh 2vw;
+    font-size: 1rem;
+    font-weight: 200;
+    padding: 1.5vh 2.5vw;
     background-color: #BBE2EC;
     color: #102F3F;
     border: none;
@@ -53,8 +54,8 @@ button {
 
 #output-text {
     margin-top: 1vh;
-    width: 100%;
-    height: calc(100% - 2em);
+    width: 90%;
+    height: calc(60% - 2em);
 }
 
 .transcription-box {
@@ -72,6 +73,9 @@ body::before {
     z-index: -1;
 }
 
+.disclaimer {
+    font-size: x-small;
+}
 
 /* Text stuff */
 
