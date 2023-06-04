@@ -17,7 +17,7 @@ const startRecording = async () => {
             type: 'audio',
             mimeType: 'audio/webm',
             numberOfAudioChannels: 1,
-            recorderType: RecordRTC.WebAssemblyRecorder,
+            recorderType: RecordRTC.StereoAudioRecorder,
             checkForInactiveTracks: true,
             desiredSampRate: 16000, // Set sample rate to 16kHz
             bitRate: 96 // Set bitrate to 96
