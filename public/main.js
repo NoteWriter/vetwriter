@@ -18,7 +18,9 @@ const startRecording = async () => {
             mimeType: 'audio/webm',
             numberOfAudioChannels: 1,
             recorderType: RecordRTC.StereoAudioRecorder,
-            checkForInactiveTracks: true
+            checkForInactiveTracks: true,
+            desiredSampRate: 16000, // Set sample rate to 16kHz
+            bitRate: 96 // Set bitrate to 96
         };
 
         recordRTC = new RecordRTC(stream, options);
@@ -36,6 +38,8 @@ const stopRecording = () => {
     if (recordRTC) {
         recordRTC.stopRecording(() => {
             const audioBlob = recordRTC.getBlob();
+            const fileSize = (audioBlob.size / 1024 / 1024).toFixed(2); // size in MB
+            console.log(`File size: ${fileSize} MB`);
             sendToWhisperAPI(audioBlob);
         });
 
