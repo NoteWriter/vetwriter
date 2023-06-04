@@ -25,6 +25,7 @@ const startRecording = async () => {
         recordRTC.startRecording();
 
         recordButton.textContent = 'Stop';
+        recordButton.style.backgroundColor = #FBD5D6;
     } catch (err) {
         console.error('Error:', err);
     }
@@ -38,6 +39,7 @@ const stopRecording = () => {
         });
 
         recordButton.textContent = 'Start';
+        recordButton.style.backgroundColor = '#40acc9';
     }
 };
 
@@ -118,3 +120,10 @@ const downloadTextFile = () => {
 };
 
 downloadButton.addEventListener('click', downloadTextFile);
+
+const copyButton = document.getElementById('copyButton');
+
+copyButton.addEventListener('click', function() {
+    outputTextArea.select();
+    document.execCommand("copy");
+});
