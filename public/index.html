@@ -9,32 +9,23 @@
   <title>NoteWriter</title>
 </head>
 <body>
-  <header>
-    <nav>
-      <img src="logo.png" alt="Logo" class="nav-logo">
-      <ul id="nav-list">
-        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
-      </ul>
-    </nav>
-  </header>
-
   <div class="header">
     <img src="Emblem.jpg" alt="Header Logo" class="header-logo">
    </div>
-
   <div class="content">
     <label for="patient-name">Patient Name:</label>
     <input type="text" id="patient-name" name="patient-name"><br>
-    <button id="recordButton">Start</button>
-    <textarea id="output-text" rows="20" cols="100"></textarea>
-    <button id="downloadButton">Download .txt file</button>
-    <h2>Transcript</h2>
+    <div class="button-container">
+      <button id="recordButton">Start</button>
+      <button id="downloadButton">Download .txt file</button>
+    </div>
+    <p class="disclaimer">By clicking "Start" you acknolwedge that you have obtained consent from your patient to release their pets' health information to NoteWriter, LLC, OpenAI, and any other entities or individuals deemed necessary by NoteWriter, LLC.</p>
+    <textarea id="output-text"></textarea>
     <div id="transcription-box" class="transcription-box">
       <p id="transcription"></p>
     </div>
-
-    <script src="https://cdn.WebRTC-Experiment.com/RecordRTC.js"></script>
-    <script src="main.js"></script>
+  </div>
+  <script src="https://cdn.WebRTC-Experiment.com/RecordRTC.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>

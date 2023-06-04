@@ -3,61 +3,30 @@ body {
     flex-direction: column;
     height: 100vh;
     background-color: #fff;
-    padding-top: 60px; /* Add padding to body to avoid content being hidden behind the fixed navbar */
+    padding-top: 60px;
 }
 
 .content {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start; /* Changed from center to flex-start */
     flex-grow: 1;
-}
-
-nav {
-    position: fixed; /* Fixed navbar */
-    top: 0; /* Align navbar to top */
-    width: 100%;
-    background-color: #40acc9;
-    z-index: 1000; /* Make sure navbar is on top of all other elements */
-}
-
-.nav-logo {
-    height: 50px; /* Adjust as needed */
-    margin-right: 20px; /* Adjust as needed */
-    float: left; /* To float the logo to the left */
+    padding: 0 10px; /* Add padding to sides for better visual spacing */
 }
 
 .header-logo {
-    height: 3em; /* Adjust as needed */
+    height: 3em;
     width: auto;
 }
 
-#nav-list {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-}
-
-.nav-item {
-    float: left;
-}
-
-.nav-link {
-    display: block;
-    color: white;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-}
-
-.nav-link:hover {
-    background-color: #111;
-}
-
 .header {
-  text-align: center;
+  text-align: left; /* Changed from center to left */
   margin-bottom: 20px;
+}
+
+.button-container {
+    display: flex;
+    justify-content: flex-start;
 }
 
 button {
@@ -69,49 +38,25 @@ button {
     border-radius: 5px;
     cursor: pointer;
     margin-top: 20px;
+    margin-right: 10px; /* Add a margin to the right to separate the buttons */
 }
 
 button:focus {
     outline: none;
 }
 
-p {
-    font-size: 1.2rem;
+.disclaimer {
+    font-size: 1rem;
+    color: #888;
+    opacity: 0.8;
     margin-top: 20px;
 }
 
-<style>
-    textarea {
-        width: 100%;  /* You can set this to any width. */
-        height: 300px;  /* You can set this to any height. */
-    }
-</style>
+#output-text {
+    width: 100%;
+    height: calc(100% - 2em); /* Fill up the remaining space, adjust value as necessary */
+}
 
 .transcription-box {
-  background-color: #fff; /* Or any color you prefer */
-  border: 1px solid #000; /* Or any color you prefer */
-  padding: 10px;
-  box-sizing: border-box;
-  text-align: center;
-  max-width: 600px; /* Adjust this value as needed */
-  margin: 10px auto; /* This centers the box if the parent element has a defined width */
-}
-
-.dropdown-section {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-.dropdown-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.dropdown-title {
-    margin-bottom: 10px;
-    font-size: 20px;
-    text-align: center;
-}
+  background-color: #fff;
+  border: 
