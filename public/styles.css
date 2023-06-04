@@ -5,6 +5,9 @@ body {
     background-color: #fff;
     padding-top: 5vh;
     padding-left: 20vw;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 200;
+    font-size: medium;
 }
 
 .content {
@@ -13,6 +16,8 @@ body {
     align-items: flex-start;
     flex-grow: 1;
     padding: 0 2vw;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 200;
 }
 
 .header-logo {
@@ -26,10 +31,11 @@ body {
 }
 
 #patient-name {
-    width: 40%; /* Change as per your need */
-    height: 4%; /* Change as per your need */
-    font-size: 1.5rem; /* Change as per your need */
+    width: 40%;
+    height: 4%;
+    font-size: 1.5rem;
     vertical-align: middle;
+    color: #000; /* Set the user-input text color to black */
 }
 
 .button-container {
@@ -50,11 +56,10 @@ button {
 }
 
 .button, .button-other {
-    font-size: 1rem; /* Set the desired font size */
-    font-family: 'Montserrat', sans-serif; /* Ensure the correct font-family is being applied */
-    font-weight: 200; /* Set the desired font weight */
+    font-size: 1rem;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 200;
 }
-
 
 .button {
     background-color: #BBE2EC;
@@ -68,6 +73,8 @@ button {
     margin-top: 1vh;
     width: 90%;
     height: calc(60% - 2em);
+    font-family: 'Montserrat', sans-serif;
+    color: #000; /* Set the user-input text color to black */
 }
 
 .transcription-box {
@@ -95,6 +102,7 @@ body::before {
 
 body {
     font-family: 'Montserrat', sans-serif;
+    font-weight: 200;
 }
 
 .thin {
