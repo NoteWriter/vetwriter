@@ -25,15 +25,20 @@ body {
   margin-bottom: 8vh;
 }
 
+#patient-name {
+    width: 40%; /* Change as per your need */
+    height: 4%; /* Change as per your need */
+    font-size: 1.5rem; /* Change as per your need */
+    vertical-align: middle;
+}
+
 .button-container {
     display: flex;
     justify-content: flex-start;
 }
 
 button {
-    font-size: 1rem;
-    font-weight: 200;
-    padding: 1.5vh 2.5vw;
+    padding: 1.6vh 2.75vw;
     background-color: #BBE2EC;
     color: #102F3F;
     border: none;
@@ -43,6 +48,13 @@ button {
     margin-right: 1vw; 
     margin-bottom: 0.5vh;
 }
+
+.button, .button-other {
+    font-size: 1rem; /* Set the desired font size */
+    font-family: 'Montserrat', sans-serif; /* Ensure the correct font-family is being applied */
+    font-weight: 200; /* Set the desired font weight */
+}
+
 
 .button {
     background-color: #BBE2EC;
@@ -74,7 +86,9 @@ body::before {
 }
 
 .disclaimer {
-    font-size: x-small;
+    font-size: smaller;
+    font-weight: 100;
+    font-style: italic;
 }
 
 /* Text stuff */
