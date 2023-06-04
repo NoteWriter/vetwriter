@@ -40,7 +40,7 @@ button {
     cursor: pointer;
     margin-top: 2vh;
     margin-right: 1vw; 
-    margin-bottom: 2vh;
+    margin-bottom: 0.5vh;
 }
 
 .button {
@@ -52,6 +52,7 @@ button {
 }
 
 #output-text {
+    margin-top: 1vh;
     width: 100%;
     height: calc(100% - 2em);
 }
@@ -69,4 +70,47 @@ body::before {
     height: 100%;
     background-image: linear-gradient(to right, #102F3F, #000);
     z-index: -1;
+}
+
+
+/* Text stuff */
+
+body {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.thin {
+    font-weight: 100; /* Thin */
+}
+
+.thin-italics {
+    font-weight: 100;
+    font-style: italic;
+}
+
+.normal {
+    font-weight: 400; /* Normal */
+}
+
+.bold {
+    font-weight: 700; /* Bold */
+}
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 100;
+    color: #9b9b9b; 
+    opacity: 1; /* Firefox */
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 100;
+    color: #9b9b9b;
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 100;
+    color: #9b9b9b;
 }
