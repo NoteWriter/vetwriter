@@ -26,6 +26,7 @@ const startRecording = async () => {
 
         recordButton.textContent = 'Stop';
         recordButton.style.backgroundColor = '#FBD5D6';
+        recordButton.style.color = '102F3F';
     } catch (err) {
         console.error('Error:', err);
     }
