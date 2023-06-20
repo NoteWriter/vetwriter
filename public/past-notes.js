@@ -9,11 +9,14 @@ async function fetchPastNotes() {
       data.forEach((note) => {
         const noteElement = document.createElement('a');
         noteElement.textContent = `${note.patient_name} - ${note.timestamp}`;
-        noteElement.href = `/note.html?id=${note.id}`;
+        noteElement.href = `/note?id=${note.id}`;
         notesContainer.appendChild(noteElement);
+
+        // Add a line break for better readability
+        const breakElement = document.createElement('br');
+        notesContainer.appendChild(breakElement);
       });
     } catch (error) {
       console.error('Error:', error);
     }
 }
-fetchPastNotes();
