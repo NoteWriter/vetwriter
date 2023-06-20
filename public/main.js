@@ -1,11 +1,13 @@
 let API_KEY;
 
-const recordButton = document.getElementById('recordButton');
 const transcriptionElement = document.getElementById('transcription');
 const outputTextArea = document.getElementById('output-text');
-let recordRTC;
 
+const recordButton = document.getElementById('recordButton');
+const pauseButton = document.getElementById('pauseButton');
 const patientNameElement = document.getElementById('patient-name'); // New line to get the patient name element
+
+let recordRTC;
 let patientName; // New line to declare the patient name variable
 
 pauseButton.style.display = 'none'; 
@@ -33,13 +35,11 @@ const startRecording = async () => {
 
         recordButton.textContent = 'Stop';
         recordButton.style.backgroundColor = '#FBD5D6';
-        recordButton.style.color = '102F3F';
+        recordButton.style.color = '#102F3F';
     } catch (err) {
         console.error('Error:', err);
     }
 };
-
-const pauseButton = document.getElementById('pauseButton');
 
 const pauseRecording = () => {
     if (recordRTC && recordRTC.getState() === 'recording') {
