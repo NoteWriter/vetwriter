@@ -117,6 +117,16 @@ app.post('/chatgpt', async (req, res) => {
   }
 });
 
+app.get('/past-notes', async (req, res) => {
+  try {
+    const result = await db.any('SELECT patient_name, timestamp FROM vetwriter ORDER BY timestamp DESC');
+    res.json(result);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Error fetching past notes' });
+  }
+});
+
 
 app.use(express.static('public'));
 
