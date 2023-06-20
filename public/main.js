@@ -8,6 +8,8 @@ let recordRTC;
 const patientNameElement = document.getElementById('patient-name'); // New line to get the patient name element
 let patientName; // New line to declare the patient name variable
 
+pauseButton.style.display = 'none'; 
+
 const startRecording = async () => {
     try {
         patientName = patientNameElement.value; // New line to get patient name
@@ -23,8 +25,11 @@ const startRecording = async () => {
             bitRate: 32 // Set bitrate to 96
         };
 
+        
+
         recordRTC = new RecordRTC(stream, options);
         recordRTC.startRecording();
+        pauseButton.style.display = 'inline-block'; // Show the Pause button
 
         recordButton.textContent = 'Stop';
         recordButton.style.backgroundColor = '#FBD5D6';
@@ -34,6 +39,35 @@ const startRecording = async () => {
     }
 };
 
+const pauseButton = document.getElementById('pauseButton');
+
+const pauseRecording = () => {
+    if (recordRTC && recordRTC.getState() === 'recording') {
+        recordRTC.pauseRecording();
+        pauseButton.textContent = 'Continue';
+    }
+    pauseButton.textContent = 'Continue';
+    recordButton.style.display = 'none'; // Hide the Record button
+};
+
+const resumeRecording = () => {
+    if (recordRTC && recordRTC.getState() === 'paused') {
+        recordRTC.resumeRecording();
+        pauseButton.textContent = 'Pause';
+    }
+    pauseButton.textContent = 'Pause';
+    recordButton.style.display = 'inline-block';
+};
+
+pauseButton.addEventListener('click', () => {
+    if (recordRTC && recordRTC.getState() === 'recording') {
+        pauseRecording();
+    } else if (recordRTC && recordRTC.getState() === 'paused') {
+        resumeRecording();
+    }
+});
+
+
 const stopRecording = () => {
     if (recordRTC) {
         recordRTC.stopRecording(() => {
@@ -41,6 +75,7 @@ const stopRecording = () => {
             const fileSize = (audioBlob.size / 1024 / 1024).toFixed(2); // size in MB
             console.log(`File size: ${fileSize} MB`);
             sendToWhisperAPI(audioBlob);
+            pauseButton.style.display = 'none'; // Hide the Pause button
         });
 
         recordButton.textContent = 'Start';
