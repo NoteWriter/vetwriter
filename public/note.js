@@ -11,7 +11,5 @@ async function fetchNote() {
     } catch (error) {
       console.error('Error:', error);
     }
-  }
-  
-  fetchNote();
-  
+}
+fetchNote();

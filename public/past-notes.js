@@ -8,14 +8,12 @@ async function fetchPastNotes() {
   
       data.forEach((note) => {
         const noteElement = document.createElement('a');
-        noteElement.textContent = `${note.patient_name} - ${new Date(note.timestamp).toLocaleString()}`;
+        noteElement.textContent = `${note.patient_name} - ${note.timestamp}`;
         noteElement.href = `/note.html?id=${note.id}`;
         notesContainer.appendChild(noteElement);
       });
     } catch (error) {
       console.error('Error:', error);
     }
-  }
-  
-  fetchPastNotes();
-  
+}
+fetchPastNotes();

@@ -118,13 +118,20 @@ app.post('/chatgpt', async (req, res) => {
 });
 
 app.get('/past-notes', async (req, res) => {
-  try {
-       const result = await db.any('SELECT id, patient_name, timestamp FROM vetwriter ORDER BY timestamp DESC');
-    res.json(result);
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Error fetching past notes' });
-  }
+  const data = await db.any('SELECT * FROM vetwriter ORDER BY timestamp DESC');
+  res.json(data.map(note => {
+      return {
+          id: note.id,
+          patient_name: note.patient_name || "Anonymous",
+          timestamp: new Date(note.timestamp).toLocaleString(),
+      };
+  }));
+});
+
+app.get('/note', async (req, res) => {
+  const noteId = req.query.id;
+  const note = await db.one('SELECT * FROM vetwriter WHERE id = $1', [noteId]);
+  res.json(note);
 });
 
 
