@@ -140,20 +140,26 @@ app.get('/past-notes', async (req, res) => {
 });
 
 
-  app.get('/note', async (req, res) => {
-    const noteId = req.query.id;
-    try {
-      const note = await db.one('SELECT * FROM vetwriter WHERE id = $1', [noteId]);
-      res.json({ 
-        reply: note.Reply, 
-        patientName: note.Patient_name,
-        timestamp: note.Timestamp
-      });  
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'An error occurred while fetching the note' });
-    }
-  });
+app.get('/note', async (req, res) => {
+  const noteId = req.query.id;
+
+  try {
+    const note = await db.one('SELECT * FROM vetwriter WHERE id = $1', [noteId]);
+
+    res.render('note', { 
+      note: {
+        id: note.id,
+        patient_name: note.patient_name || "Blank",
+        timestamp: new Date(note.timestamp).toLocaleString(),
+        reply: note.reply
+      }
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Error while fetching the note.' });
+  }
+});
+
   
 
 app.get('/', (req, res) => {
