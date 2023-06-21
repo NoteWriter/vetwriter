@@ -9,19 +9,18 @@
 <body>
   <div class="navbar">
     <ul>
+      <li><a href="/index">Home</a></li>
       <li><a href="/past-notes">Past Notes</a></li>
       <li><a href="/login">Login/Signup</a></li>
     </ul>
   </div>
   <h1>Past Notes</h1>
   <div id="notes-container">
-    <ul>
-      <% notes.forEach((note) => { %>
-        <li>
-          <a href="/note?id=<%= note.id %>"><%= note.patient_name %> - <%= note.timestamp %></a>
-        </li>
-      <% }); %>
-    </ul>
+    <% notes.forEach((note) => { %>
+      <a href="/note?id=<%= note.id %>"><%= note.patient_name %> - <%= note.timestamp %></a>
+      <br>
+    <% }); %>
   </div>
+
 </body>
 </html>

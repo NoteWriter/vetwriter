@@ -172,3 +172,16 @@ body {
     font-weight: 700;
   }
   
+
+  /* Past Notes */
+  #notes-container a {
+    font-size: 20px; /* Set the font size to your preference */
+    text-decoration: none; /* Remove the underline */
+    color: #000; /* Set the text color to black */
+    margin-bottom: 20px; /* Add space below each link */
+    display: block; /* Make each link a block to add space around */
+  }
+
+  #notes-container a:hover {
+    color: #007BFF; /* Change color on hover, for example to Bootstrap primary blue */
+  }
