@@ -7,6 +7,8 @@ import multer from 'multer';
 import { File } from 'formdata-node';
 import fs from 'fs/promises';
 import pgPromise from 'pg-promise';
+import path from 'path';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -19,6 +21,9 @@ const host = process.env.HOST || 'http://localhost';
 
 const upload = multer({ storage: multer.memoryStorage() });
 app.use(express.json());
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 const pgp = pgPromise({
   /* initialization options */
@@ -118,24 +123,28 @@ app.post('/chatgpt', async (req, res) => {
 });
 
 app.get('/past-notes', async (req, res) => {
-  const data = await db.any('SELECT * FROM vetwriter ORDER BY timestamp DESC');
-  res.json(data.map(note => {
-      return {
-          id: note.id,
-          patient_name: note.patient_name || "Anonymous",
-          timestamp: new Date(note.timestamp).toLocaleString(),
-      };
-  }));
+  try {
+    const notes = await db.any('SELECT * FROM vetwriter ORDER BY timestamp DESC');
+    
+    res.render('past-notes', { notes: notes.map(note => {
+        return {
+            id: note.id,
+            patient_name: note.patient_name || "Blank",
+            timestamp: new Date(note.timestamp).toLocaleString(),
+        };
+    })});
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Error while fetching past notes.' });
+  }
 });
+
 
 app.get('/note', async (req, res) => {
   const noteId = req.query.id;
   const note = await db.one('SELECT * FROM vetwriter WHERE id = $1', [noteId]);
   res.json(note);
 });
-
-
-app.use(express.static('public'));
 
 app.get('/', (req, res) => {
   res.sendFile('index.html', { root: __dirname + '/public/' });
