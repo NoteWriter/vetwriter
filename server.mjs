@@ -10,6 +10,7 @@ import pgPromise from 'pg-promise';
 import path from 'path';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
+import cookieParser from 'cookie-parser';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -22,7 +23,7 @@ const host = process.env.HOST || 'http://localhost';
 
 const upload = multer({ storage: multer.memoryStorage() });
 app.use(express.json());
-
+app.use(cookieParser());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
