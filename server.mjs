@@ -8,6 +8,8 @@ import { File } from 'formdata-node';
 import fs from 'fs/promises';
 import pgPromise from 'pg-promise';
 import path from 'path';
+import bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -121,6 +123,70 @@ app.post('/chatgpt', async (req, res) => {
   }
 });
 
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
+
+const initializeDatabase = async () => {
+  try {
+    await db.none(`
+      CREATE TABLE IF NOT EXISTS vetwriter(
+        id SERIAL PRIMARY KEY,
+        patient_name TEXT,
+        transcription TEXT,
+        reply TEXT,
+        content TEXT,
+        timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await db.none(`
+      CREATE TABLE IF NOT EXISTS users(
+        id SERIAL PRIMARY KEY,
+        username TEXT UNIQUE,
+        password TEXT,
+        session_token TEXT UNIQUE
+      )
+    `);
+    console.log("Tables created successfully");
+  } catch (error) {
+    console.error("Error creating tables:", error);
+  }
+};
+
+initializeDatabase();
+
+// Session middleware
+app.use(async (req, res, next) => {
+  const sessionToken = req.cookies.sessionToken;
+
+  if (!sessionToken) {
+    // No session token in cookie - user is not logged in
+    req.user = null;
+  } else {
+    try {
+      const user = await db.one('SELECT * FROM users WHERE session_token = $1', [sessionToken]);
+      req.user = user;
+    } catch (error) {
+      console.error('Error:', error);
+      req.user = null;
+    }
+  }
+
+  next();
+});
+
+// This is your new home page
+app.get('/', (req, res) => {
+  res.sendFile('login.html', { root: __dirname + '/public/' });
+});
+
+// This is your old home page moved to a new route
+app.get('/home', (req, res) => {
+  res.sendFile('index.html', { root: __dirname + '/public/' });
+});
+
+app.use(express.static('public')); // This line sets up static file serving
+
 app.get('/past-notes', async (req, res) => {
   try {
     const notes = await db.any('SELECT * FROM vetwriter ORDER BY timestamp DESC');
@@ -160,40 +226,67 @@ app.get('/note', async (req, res) => {
 });
 
 
-// This is your new home page
-app.get('/', (req, res) => {
-  res.sendFile('login.html', { root: __dirname + '/public/' });
-});
+// Create a new route for user registration
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+  const saltRounds = 10;
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-// This is your old home page moved to a new route
-app.get('/home', (req, res) => {
-  res.sendFile('index.html', { root: __dirname + '/public/' });
-});
-
-app.use(express.static('public')); // This line sets up static file serving
-
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
-
-const initializeDatabase = async () => {
   try {
-    await db.none(`
-      CREATE TABLE IF NOT EXISTS vetwriter(
-        id SERIAL PRIMARY KEY,
-        patient_name TEXT,
-        transcription TEXT,
-        reply TEXT,
-        content TEXT,
-        timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    console.log("Table created successfully");
+    const existingUser = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username]);
+    if (existingUser) {
+      res.status(409).json({ message: 'Username already exists' });
+      return;
+    }
+    
+    await db.none('INSERT INTO users(username, password) VALUES($1, $2)', [username, hashedPassword]);
+    res.json({ message: 'User created successfully' });
   } catch (error) {
-    console.error("Error creating table:", error);
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Error while creating user.' });
   }
-};
+});
 
 
-initializeDatabase();
+
+// Create a new route for user login
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const user = await db.one('SELECT * FROM users WHERE username = $1', [username]);
+
+    const passwordMatches = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatches) {
+      res.status(401).json({ message: 'Invalid username or password' });
+      return;
+    }
+
+    // If password matches, we'll generate a session token
+    const sessionToken = uuidv4();
+
+    // Store the session token in the database, associated with this user
+    await db.none('UPDATE users SET session_token = $1 WHERE id = $2', [sessionToken, user.id]);
+
+    // And send it back as a cookie
+    res.cookie('sessionToken', sessionToken, { maxAge: 7200000, httpOnly: true, secure: true, sameSite: 'strict' });
+    res.json({ message: 'Logged in successfully' });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Error while logging in.' });
+  }
+});
+
+// Logout endpoint
+app.post('/logout', async (req, res) => {
+  try {
+    const sessionToken = req.cookies.sessionToken;
+    await db.none('UPDATE users SET session_token = NULL WHERE session_token = $1', [sessionToken]);
+    res.clearCookie('sessionToken');
+    res.json({ message: 'Logged out successfully' });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Error while logging out.' });
+  }
+});
