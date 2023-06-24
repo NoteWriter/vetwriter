@@ -5,7 +5,8 @@
   "main": "server.mjs",
   "type": "module",
   "scripts": {
-    "start": "node server.mjs"
+    "start": "node server.mjs",
+    "heroku-postbuild": "npm rebuild bcrypt --build-from-source"
   },
   "keywords": [],
   "author": "",
@@ -23,4 +24,5 @@
     "pg-promise": "^11.5.0",
     "uuid": "^9.0.0"
   }
+  
 }
