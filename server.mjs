@@ -42,6 +42,20 @@ const connection = {
 // Pass the connection configuration to pg-promise
 const db = pgp(connection);
 
+const addColumn = async () => {
+  try {
+    await db.none(`
+      ALTER TABLE vetwriter ADD COLUMN user_id INTEGER REFERENCES users(id)
+    `);
+    console.log("Column user_id added successfully");
+  } catch (error) {
+    console.error("Error adding column:", error);
+  }
+};
+
+addColumn();
+
+
 app.post('/whisper/asr', upload.single('audio'), async (req, res) => {
   const patientName = req.query.patientName; // Extract patient name from query parameters
   const audioBuffer = Buffer.from(req.file.buffer);
