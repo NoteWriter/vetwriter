@@ -131,6 +131,14 @@ app.listen(port, () => {
 const initializeDatabase = async () => {
   try {
     await db.none(`
+    CREATE TABLE IF NOT EXISTS users(
+      id SERIAL PRIMARY KEY,
+      username TEXT UNIQUE,
+      password TEXT,
+      session_token TEXT UNIQUE
+      )
+    `);
+    await db.none(`
     CREATE TABLE IF NOT EXISTS vetwriter(
       id SERIAL PRIMARY KEY,
       user_id INTEGER REFERENCES users(id),
@@ -139,14 +147,6 @@ const initializeDatabase = async () => {
       reply TEXT,
       content TEXT,
       timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    await db.none(`
-      CREATE TABLE IF NOT EXISTS users(
-        id SERIAL PRIMARY KEY,
-        username TEXT UNIQUE,
-        password TEXT,
-        session_token TEXT UNIQUE
       )
     `);
     console.log("Tables created successfully");
