@@ -176,17 +176,26 @@ app.use(async (req, res, next) => {
   next();
 });
 
+// This will serve the index.html if user is logged in else, returns 'Not authorized'
+app.get('/home', (req, res) => {
+  if (!req.user) {
+    res.status(401).json({ message: 'Not authorized' });
+  } else {
+    res.sendFile('index.html', { root: __dirname + '/public/' });
+  }
+});
+
 // This is your new home page
 app.get('/', (req, res) => {
   res.sendFile('login.html', { root: __dirname + '/public/' });
 });
 
-// This is your old home page moved to a new route
-app.get('/home', (req, res) => {
-  res.sendFile('index.html', { root: __dirname + '/public/' });
-});
-
 app.use(express.static('public')); // This line sets up static file serving
+
+// This will serve the register.html if a user wants to register
+app.get('/register', (req, res) => {
+  res.sendFile('register.html', { root: __dirname + '/public/' });
+});
 
 app.get('/past-notes', async (req, res) => {
   try {
