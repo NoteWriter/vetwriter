@@ -281,7 +281,7 @@ app.post('/login', async (req, res) => {
 
     // And send it back as a cookie
     res.cookie('sessionToken', sessionToken, { maxAge: 7200000, httpOnly: true, secure: true, sameSite: 'strict' });
-    res.json({ message: 'Logged in successfully' });
+    res.json({ success: true, message: 'Logged in successfully' });
   } catch (error) {
     console.error('Error:', error);
     res.status(500).json({ error: 'Error while logging in.' });
