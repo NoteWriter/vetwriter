@@ -42,6 +42,26 @@ const connection = {
 // Pass the connection configuration to pg-promise
 const db = pgp(connection);
 
+// Session middleware
+app.use(async (req, res, next) => {
+  const sessionToken = req.cookies.sessionToken;
+
+  if (!sessionToken) {
+    // No session token in cookie - user is not logged in
+    req.user = null;
+  } else {
+    try {
+      const user = await db.one('SELECT * FROM users WHERE session_token = $1', [sessionToken]);
+      req.user = user;
+    } catch (error) {
+      console.error('Error:', error);
+      req.user = null;
+    }
+  }
+
+  next();
+});
+
 app.post('/whisper/asr', upload.single('audio'), async (req, res) => {
   const patientName = req.query.patientName; // Extract patient name from query parameters
   const audioBuffer = Buffer.from(req.file.buffer);
@@ -156,26 +176,6 @@ const initializeDatabase = async () => {
 };
 
 initializeDatabase();
-
-// Session middleware
-app.use(async (req, res, next) => {
-  const sessionToken = req.cookies.sessionToken;
-
-  if (!sessionToken) {
-    // No session token in cookie - user is not logged in
-    req.user = null;
-  } else {
-    try {
-      const user = await db.one('SELECT * FROM users WHERE session_token = $1', [sessionToken]);
-      req.user = user;
-    } catch (error) {
-      console.error('Error:', error);
-      req.user = null;
-    }
-  }
-
-  next();
-});
 
 // This will serve the index.html if user is logged in else, returns 'Not authorized'
 app.get('/home', (req, res) => {
