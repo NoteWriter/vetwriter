@@ -70,8 +70,8 @@ app.post('/whisper/asr', upload.single('audio'), async (req, res) => {
   
 // Insert transcription into database with the current timestamp
 await db.none(
-  'INSERT INTO vetwriter(patient_name, transcription, timestamp) VALUES($1, $2, NOW())',
-  [patientName, transcription]
+  'INSERT INTO vetwriter(user_id, patient_name, transcription, timestamp) VALUES($1, $2, $3, NOW())',
+  [req.user.id, patientName, transcription]
 );
   
     res.json({ transcription: transcription });
@@ -113,7 +113,7 @@ app.post('/chatgpt', async (req, res) => {
 
     // Update database entry with reply and content
     try {
-      await db.none('UPDATE vetwriter SET reply = $1, content = $2 WHERE transcription = $3', [message, requestBody.messages[0].content, userMessage]);
+      await db.none('UPDATE vetwriter SET reply = $1, content = $2 WHERE transcription = $3 AND user_id = $4', [message, requestBody.messages[0].content, userMessage, req.user.id]);
       res.json({ reply: message });
     } catch (error) {
       throw new Error('Error updating the database');
@@ -131,13 +131,14 @@ app.listen(port, () => {
 const initializeDatabase = async () => {
   try {
     await db.none(`
-      CREATE TABLE IF NOT EXISTS vetwriter(
-        id SERIAL PRIMARY KEY,
-        patient_name TEXT,
-        transcription TEXT,
-        reply TEXT,
-        content TEXT,
-        timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+    CREATE TABLE IF NOT EXISTS vetwriter(
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id),
+      patient_name TEXT,
+      transcription TEXT,
+      reply TEXT,
+      content TEXT,
+      timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
       )
     `);
     await db.none(`
@@ -199,7 +200,7 @@ app.get('/register', (req, res) => {
 
 app.get('/past-notes', async (req, res) => {
   try {
-    const notes = await db.any('SELECT * FROM vetwriter ORDER BY timestamp DESC');
+    const notes = await db.any('SELECT * FROM vetwriter WHERE user_id = $1 ORDER BY timestamp DESC', [req.user.id]);
     
     res.render('past-notes', { notes: notes.map(note => {
         return {
