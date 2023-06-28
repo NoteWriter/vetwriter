@@ -185,3 +185,54 @@ body {
   #notes-container a:hover {
     color: #007BFF; /* Change color on hover, for example to Bootstrap primary blue */
   }
+
+
+.login-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0 2vw;
+  }
+  
+  .login-content h1, .login-content h2 {
+    color: #102F3F;
+  }
+  
+  .login-content p {
+    color: #555;
+    margin: 10px 0;
+  }
+  
+  #loginForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  #loginForm label {
+    margin-top: 10px;
+  }
+  
+  #loginForm input[type=text], #loginForm input[type=password] {
+    margin-top: 5px;
+    padding: 5px;
+    width: 200px;
+  }
+  
+  #loginForm input[type=submit] {
+    margin-top: 10px;
+    padding: 5px 15px;
+    background-color: #BBE2EC;
+    border: none;
+    border-radius: 5px;
+    color: #102F3F;
+    cursor: pointer;
+  }
+  
+  .login-content a {
+    color: #007BFF;
+  }
+  

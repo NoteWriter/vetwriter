@@ -1,19 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Login</title>
-  <link rel="stylesheet" href="/styles.css">
+  <title>Welcome to NoteWriter</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0, 300;0,400;0,700;1,100;1,300;1,700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h1>Login</h1>
-  <form id="loginForm">
-    <label for="username">Username:</label><br>
-    <input type="text" id="username" name="username" required><br>
-    <label for="password">Password:</label><br>
-    <input type="password" id="password" name="password" required><br>
-    <input type="submit" value="Submit">
-  </form>
-  <p>New user? <a href="/register">Register here</a></p>
+  <div class="navbar">
+    <ul>
+      <li><a href="/home">Home</a></li>
+      <li><a href="/past-notes">Past Notes</a></li>
+    </ul>
+  </div>
+  <div class="login-content">
+    <h1 class="normal">Welcome to NoteWriterVET</h1>
+    <h2 class="normal">Login</h2>
+    <form id="loginForm">
+      <label class="normal" for="username">Username:</label><br>
+      <input type="text" id="username" name="username" required><br>
+      <label class="normal" for="password">Password:</label><br>
+      <input type="password" id="password" name="password" required><br>
+      <input class="button" type="submit" value="Submit">
+    </form>
+    <p class="normal">New user? <a href="/register">Register here</a></p>
+    <p class="normal">
+      NoteWriter is an innovative application designed to enhance the day-to-day operations of veterinary practices. Leveraging advanced Artificial Intelligence technologies, NoteWriter automates the note-taking process, liberating veterinarians from the tedious task of documentation and allowing them to focus more on providing care for their patients.
+    </p>
+    <p class="normal">
+      NoteWriter captures key details from your visits and instantly generates comprehensive and professional notes. With NoteWriter, you can ensure all pertinent details are recorded accurately and efficiently.
+    </p>
+    <h2 class="normal">Experience the future of veterinary practice today!</h2>
+    <p class="normal">
+      NoteWriter is currently free to use. Register today and enhance your practice with the power of AI.
+    </p>
+
+  </div>
   <script src="/login.js"></script>
 </body>
 </html>
