@@ -239,8 +239,9 @@ app.get('/note', async (req, res) => {
 
 // Create a new route for user registration
 app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-  const saltRounds = 10;
+  let { username, password } = req.body;
+  username = username.toLowerCase();  
+  const saltRounds = 15;
   const hashedPassword = await bcrypt.hash(password, saltRounds);
 
   try {
@@ -262,7 +263,8 @@ app.post('/register', async (req, res) => {
 
 // Create a new route for user login
 app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
+  let { username, password } = req.body;
+  username = username.toLowerCase();  
 
   try {
     const user = await db.one('SELECT * FROM users WHERE username = $1', [username]);
