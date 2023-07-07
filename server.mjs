@@ -106,11 +106,11 @@ app.post('/chatgpt', async (req, res) => {
     const userMessage = req.body.message;
 
     const requestBody = {
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-3.5-turbo-16k',
       messages: [
         {
           role: 'system',
-          content: 'You are an amazing veterinary scribe. You receive the transcriptions of conversations between veterinary doctors and the owners of their patients, you pull out the relevant medical information, and you put it all into a concise, but complete SOAP note (Subjective, Objective, Assessment, and Plan). You only use informaiton contained in the transcript. Please write a SOAP note for the following transcript:',
+          content: 'You are an amazing veterinary scribe. You receive the transcriptions of conversations between veterinary doctors and the owners of their patients, you pull out the relevant medical information, and you put it all into a complete SOAP note (Subjective, Objective, Assessment, and Plan). You only use informaiton contained in the transcript. Please write a SOAP note for the following transcript:',
         },
         {
           role: 'user',
