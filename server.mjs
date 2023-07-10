@@ -204,7 +204,8 @@ app.get('/past-notes', async (req, res) => {
     const notes = await db.any('SELECT * FROM vetwriter WHERE user_id = $1 ORDER BY timestamp DESC', [req.user.id]);
     
     res.render('past-notes', { notes: notes.map(note => {
-        let reply = note.reply ? note.reply.replace(/(Summary:|Vitals:|Subjective:|Objective:|Assessment:|Plan:)/g, '<b>$1</b> <br/>') : "";
+        let reply = note.reply ? note.reply.replace(/(Summary:|Vitals:|Subjective:|Objective:|Assessment:|Plan:)/g, '<b>$1</b> <br/><br/>') : "";
+
         return {
             id: note.id,
             patient_name: note.patient_name || "Blank",
@@ -224,7 +225,7 @@ app.get('/note', async (req, res) => {
 
   try {
     const note = await db.one('SELECT * FROM vetwriter WHERE id = $1', [noteId]);
-    let reply = note.reply ? note.reply.replace(/(Summary:|Vitals:|Subjective:|Objective:|Assessment:|Plan:)/g, '<b>$1</b> <br/>') : "";
+    let reply = note.reply ? note.reply.replace(/(Summary:|Vitals:|Subjective:|Objective:|Assessment:|Plan:)/g, '<b>$1</b> <br/><br/>') : "";
     res.render('note', { 
       note: {
         id: note.id,
