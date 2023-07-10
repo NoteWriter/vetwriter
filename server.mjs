@@ -130,11 +130,10 @@ app.post('/chatgpt', async (req, res) => {
 
     const data = await response.json();
     const message = data.choices && data.choices.length > 0 ? data.choices[0].message.content.trim() : '';
-    const formattedReply = message.replace(/(Summary:|Vitals:|Subjective:|Objective:|Assessment:|Plan:)/g, '<b>$1</b>');
     
     // Update database entry with reply and content
     try {
-      await db.none('UPDATE vetwriter SET reply = $1, content = $2 WHERE transcription = $3 AND user_id = $4', [formattedReply, requestBody.messages[0].content, userMessage, req.user.id]);
+      await db.none('UPDATE vetwriter SET reply = $1, content = $2 WHERE transcription = $3 AND user_id = $4', [message, requestBody.messages[0].content, userMessage, req.user.id]);
       res.json({ reply: message });
     } catch (error) {
       throw new Error('Error updating the database');
@@ -202,36 +201,31 @@ app.get('/register', (req, res) => {
 app.get('/past-notes', async (req, res) => {
   try {
     const notes = await db.any('SELECT * FROM vetwriter WHERE user_id = $1 ORDER BY timestamp DESC', [req.user.id]);
-    
-    res.render('past-notes', { notes: notes.map(note => {
-        let reply = note.reply ? note.reply.replace(/(Summary:|Vitals:|Subjective:|Objective:|Assessment:|Plan:)/g, '<b>$1</b> <br/><br/>') : "";
 
-        return {
-            id: note.id,
-            patient_name: note.patient_name || "Blank",
-            timestamp: new Date(note.timestamp).toLocaleString(),
-            reply: reply
-        };
-    })});
+    res.render('past-notes', { notes: notes.map(note => ({
+        id: note.id,
+        patient_name: note.patient_name || "Blank",
+        timestamp: new Date(note.timestamp).toLocaleString(),
+        reply: note.reply
+      })
+    )});
   } catch (error) {
     console.error('Error:', error);
     res.status(500).json({ error: 'Error while fetching past notes.' });
   }
 });
 
-
 app.get('/note', async (req, res) => {
   const noteId = req.query.id;
 
   try {
     const note = await db.one('SELECT * FROM vetwriter WHERE id = $1', [noteId]);
-    let reply = note.reply ? note.reply.replace(/(Summary:|Vitals:|Subjective:|Objective:|Assessment:|Plan:)/g, '<b>$1</b> <br/><br/>') : "";
     res.render('note', { 
       note: {
         id: note.id,
         patient_name: note.patient_name || "Blank",
         timestamp: new Date(note.timestamp).toLocaleString(),
-        reply: reply
+        reply: note.reply
       }
     });
   } catch (error) {
@@ -239,6 +233,7 @@ app.get('/note', async (req, res) => {
     res.status(500).json({ error: 'Error while fetching the note.' });
   }
 });
+
 
 
 // Create a new route for user registration
