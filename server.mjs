@@ -130,10 +130,11 @@ app.post('/chatgpt', async (req, res) => {
 
     const data = await response.json();
     const message = data.choices && data.choices.length > 0 ? data.choices[0].message.content.trim() : '';
-
+    const formattedReply = message.replace(/(Summary:|Vitals:|Subjective:|Objective:|Assessment:|Plan:)/g, '<b>$1</b>');
+    
     // Update database entry with reply and content
     try {
-      await db.none('UPDATE vetwriter SET reply = $1, content = $2 WHERE transcription = $3 AND user_id = $4', [message, requestBody.messages[0].content, userMessage, req.user.id]);
+      await db.none('UPDATE vetwriter SET reply = $1, content = $2 WHERE transcription = $3 AND user_id = $4', [formattedReply, requestBody.messages[0].content, userMessage, req.user.id]);
       res.json({ reply: message });
     } catch (error) {
       throw new Error('Error updating the database');
@@ -216,8 +217,6 @@ app.get('/past-notes', async (req, res) => {
     res.status(500).json({ error: 'Error while fetching past notes.' });
   }
 });
-
-
 
 
 app.get('/note', async (req, res) => {
