@@ -23,7 +23,7 @@ const startRecording = async () => {
             numberOfAudioChannels: 1,
             recorderType: RecordRTC.StereoAudioRecorder,
             checkForInactiveTracks: true,
-            desiredSampRate: 8000, // Set sample rate to 16kHz
+            desiredSampRate: 10000, // Set sample rate to 16kHz
             bitRate: 32 // Set bitrate to 96
         };
 
