@@ -17,7 +17,7 @@
   <div id="note-container">
     <h2>Patient Name: <%= note.patient_name %></h2>
     <h3>Timestamp: <%= new Date(note.timestamp).toLocaleString() %></h3>
-    <p><%= note.reply %></p>
+    <p><%- note.reply %></p>
   </div>
 </body>
 </html>

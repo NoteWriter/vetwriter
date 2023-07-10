@@ -203,10 +203,12 @@ app.get('/past-notes', async (req, res) => {
     const notes = await db.any('SELECT * FROM vetwriter WHERE user_id = $1 ORDER BY timestamp DESC', [req.user.id]);
     
     res.render('past-notes', { notes: notes.map(note => {
+        let reply = note.reply.replace(/(Summary:|Vitals:|Subjective:|Objective:|Assessment:|Plan:)/g, '<b>$1</b><br/>');
         return {
             id: note.id,
             patient_name: note.patient_name || "Blank",
             timestamp: new Date(note.timestamp).toLocaleString(),
+            reply: reply
         };
     })});
   } catch (error) {
@@ -214,6 +216,7 @@ app.get('/past-notes', async (req, res) => {
     res.status(500).json({ error: 'Error while fetching past notes.' });
   }
 });
+
 
 
 app.get('/note', async (req, res) => {
