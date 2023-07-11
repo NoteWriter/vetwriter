@@ -11,6 +11,9 @@ import path from 'path';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import cookieParser from 'cookie-parser';
+import throng from 'throng';
+import Queue from 'bull';
+import workQueue from './queue.mjs';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -74,32 +77,22 @@ app.post('/whisper/asr', upload.single('audio'), async (req, res) => {
   const outputFilePath = __dirname + '/output.webm';
   await fs.writeFile(outputFilePath, audioBuffer);
 
-  try {
-    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${API_KEY}`,
-      },
-      body: form,
-    });
-
-    const data = await response.json();
-    console.log('Whisper API response:', JSON.stringify(data));
-
-    const transcription = data.text; // Define the transcription variable
-  
-// Insert transcription into database with the current timestamp
-await db.none(
-  'INSERT INTO vetwriter(user_id, patient_name, transcription, timestamp) VALUES($1, $2, $3, NOW())',
-  [req.user.id, patientName, transcription]
-);
-  
-    res.json({ transcription: transcription });
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Error while transcribing.' });
-  }
+  const job = await workQueue.add({
+    userId: req.user.id,
+    patientName: patientName,
+    model: 'whisper-1',
+    audioFilePath: outputFilePath,
+    audioType: 'audio/webm'
 });
+
+
+  res.json({ jobId: job.id });
+});
+
+const startWorker = (id) => {
+
+  console.log(`Started worker ${id}`);
+};
 
 app.post('/chatgpt', async (req, res) => {
   try {
