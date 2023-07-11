@@ -66,15 +66,9 @@ app.use(async (req, res, next) => {
 app.post('/whisper/asr', upload.single('audio'), async (req, res) => {
   const patientName = req.query.patientName; // Extract patient name from query parameters
   const audioBuffer = Buffer.from(req.file.buffer);
-  const audioFile = new File([audioBuffer], 'audio.webm', { type: 'audio/webm' });
-  const form = new FormData();
-  form.append('file', audioFile);
-  form.append('model', 'whisper-1');
-
-  console.log('Form data:', form);
 
   // Save the converted audio file to disk
-  const outputFilePath = __dirname + '/output.webm';
+  const outputFilePath = path.join(__dirname, `output_${uuidv4()}.webm`);
   await fs.writeFile(outputFilePath, audioBuffer);
 
   const job = await workQueue.add({
@@ -83,11 +77,12 @@ app.post('/whisper/asr', upload.single('audio'), async (req, res) => {
     model: 'whisper-1',
     audioFilePath: outputFilePath,
     audioType: 'audio/webm'
-});
+  });
 
   res.json({ jobId: job.id });
   console.log('Job created:', job);
 });
+
 
 const startWorker = (id) => {
 
