@@ -94,14 +94,6 @@ const startWorker = (id) => {
   console.log(`Started worker ${id}`);
 };
 
-const WORKERS = process.env.WEB_CONCURRENCY || 1;
-
-throng({
-  workers: WORKERS,
-  lifetime: Infinity,
-  start: startWorker,
-});
-
 app.post('/chatgpt', async (req, res) => {
   try {
     const userMessage = req.body.message;
