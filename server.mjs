@@ -4,14 +4,12 @@ import { FormData } from 'formdata-node';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import multer from 'multer';
-import { File } from 'formdata-node';
 import fs from 'fs/promises';
 import pgPromise from 'pg-promise';
 import path from 'path';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import cookieParser from 'cookie-parser';
-import throng from 'throng';
 import Queue from 'bull';
 import workQueue from './queue.mjs';
 
@@ -73,6 +71,8 @@ app.post('/whisper/asr', upload.single('audio'), async (req, res) => {
   form.append('file', audioFile);
   form.append('model', 'whisper-1');
 
+  console.log('Form data:', form);
+
   // Save the converted audio file to disk
   const outputFilePath = __dirname + '/output.webm';
   await fs.writeFile(outputFilePath, audioBuffer);
@@ -85,8 +85,8 @@ app.post('/whisper/asr', upload.single('audio'), async (req, res) => {
     audioType: 'audio/webm'
 });
 
-
   res.json({ jobId: job.id });
+  console.log('Job created:', job);
 });
 
 const startWorker = (id) => {

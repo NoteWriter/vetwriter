@@ -32,7 +32,7 @@ workQueue.process(async (job) => {
       form.append('file', audioFile);
       form.append('model', model);
   
-      const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      const whisperResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${API_KEY}`,
@@ -40,18 +40,40 @@ workQueue.process(async (job) => {
         body: form,
       });
   
-      const data = await response.json();
-      console.log('Whisper API response:', JSON.stringify(data));
+      const whisperData = await whisperResponse.json();
+      console.log('Whisper API response:', JSON.stringify(whisperData));
   
-      const transcription = data.text; // Define the transcription variable
-    
-      // Insert transcription into database with the current timestamp
+      const transcription = whisperData.text; // Extract the transcription
+  
+      // Send the response from Whisper to ChatGPT
+      const requestBody = {
+        model: 'gpt-3.5-turbo-16k',
+        messages: [
+          {
+            role: 'user',
+            content: transcription,
+          },
+        ],
+      };
+  
+      const chatGPTResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+  
+      const chatGPTData = await chatGPTResponse.json();
+      const message = chatGPTData.choices && chatGPTData.choices.length > 0 ? chatGPTData.choices[0].message.content.trim() : '';
+  
+      // Insert into the database
       await db.none(
-        'INSERT INTO vetwriter(user_id, patient_name, transcription, timestamp) VALUES($1, $2, $3, NOW())',
-        [userId, patientName, transcription]
+        'INSERT INTO vetwriter(user_id, patient_name, transcription, reply, content, timestamp) VALUES($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)',
+        [userId, patientName, transcription, message, requestBody.messages[0].content]
       );
     } catch (error) {
       console.error('Error:', error);
     }
-  });
-
+});
