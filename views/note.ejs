@@ -12,6 +12,7 @@
         navigator.clipboard.writeText(textarea.value)
           .then(() => {
             console.log('Text copied to clipboard');
+            showCopySuccess();
           })
           .catch(err => {
             console.error('Could not copy text: ', err);
@@ -24,7 +25,29 @@
       textarea.rows = lineCount;
       textarea.cols = maxLineLength;
     }
+
+    function showCopySuccess() {
+      const message = document.createElement('div');
+      message.textContent = 'Copied to clipboard!';
+      message.id = 'copy-success-message';
+      document.body.appendChild(message);
+
+      setTimeout(function() {
+        message.remove();
+      }, 2000);
+    }
   </script>
+
+  <style>
+    #copy-success-message {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: lightgreen;
+      padding: 10px;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
   <div class="navbar">
