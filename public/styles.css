@@ -236,3 +236,7 @@ body {
     color: #007BFF;
   }
   
+  #note-reply {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
