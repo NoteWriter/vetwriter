@@ -5,6 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles.css">
   <title>Note</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+function copyToClipboard() {
+  const textarea = document.getElementById('note-reply');
+  navigator.clipboard.writeText(textarea.value)
+    .then(() => {
+      console.log('Text copied to clipboard');
+    })
+    .catch(err => {
+      console.error('Could not copy text: ', err);
+    });
+}
+
+
+  </script>
 </head>
 <body>
   <div class="navbar">
@@ -14,10 +29,11 @@
     </ul>
   </div>
   <h1>Note</h1>
+  <button onclick="copyToClipboard()">Copy to clipboard</button>
   <div id="note-container">
     <h2>Patient Name: <%= note.patient_name %></h2>
     <h3>Timestamp: <%= new Date(note.timestamp).toLocaleString() %></h3>
-    <p><%- note.reply.replace(/(SUMMARY:|VITALS:|SUBJECTIVE:|OBJECTIVE:|ASSESSMENT:|PLAN:|SUMMARY|VITALS|SUBJECTIVE|OBJECTIVE|ASSESSMENT|PLAN)/g, '<br><strong><br>$1<br></strong><br>') %></p>
+    <textarea id="note-reply"><%- note.reply.replace(/(SUMMARY:|VITALS:|SUBJECTIVE:|OBJECTIVE:|ASSESSMENT:|PLAN:|SUMMARY|VITALS|SUBJECTIVE|OBJECTIVE|ASSESSMENT|PLAN)/g, '<br><strong><br>$1<br></strong><br>') %></textarea>
   </div>
 </body>
 </html>
