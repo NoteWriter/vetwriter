@@ -4,9 +4,7 @@ import { File } from 'formdata-node';
 import fs from 'fs/promises';
 import workQueue from './queue.mjs';
 
-const fetch = require('node-fetch');
-const pgPromise = require('pg-promise');
-const workQueue = require('./queue.mjs');
+const API_KEY = process.env.OPENAI_API_KEY;
 
 const pgp = pgPromise({
   /* initialization options */
