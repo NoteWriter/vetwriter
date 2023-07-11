@@ -5,11 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles.css">
   <title>Note</title>
-  <link rel="stylesheet" href="styles.css">
   <script>
     window.onload = function() {
+      const textarea = document.getElementById('note-reply');
       function copyToClipboard() {
-        const textarea = document.getElementById('note-reply');
         navigator.clipboard.writeText(textarea.value)
           .then(() => {
             console.log('Text copied to clipboard');
@@ -19,14 +18,13 @@
           });
       }
       document.querySelector('button').addEventListener('click', copyToClipboard);
-  
+
       let lineCount = (textarea.value.match(/\n/g) || '').length + 1;
       let maxLineLength = Math.max(...textarea.value.split('\n').map(line => line.length));
       textarea.rows = lineCount;
       textarea.cols = maxLineLength;
     }
   </script>
-  
 </head>
 <body>
   <div class="navbar">
@@ -36,12 +34,11 @@
     </ul>
   </div>
   <h1>Note</h1>
-  <button onclick="copyToClipboard()">Copy to clipboard</button>
+  <button>Copy to clipboard</button>
   <div id="note-container">
     <h2>Patient Name: <%= note.patient_name %></h2>
     <h3>Timestamp: <%= new Date(note.timestamp).toLocaleString() %></h3>
     <textarea id="note-reply"><%- note.reply %></textarea>
-
   </div>
 </body>
 </html>
