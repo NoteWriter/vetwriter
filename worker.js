@@ -24,7 +24,7 @@ const db = pgp(connection);
 // The processing function
 workQueue.process(async (job) => {
     const { userId, patientName, model, audioFilePath, audioType } = job.data;
-    
+  
     try {
       const audioBuffer = await fs.readFile(audioFilePath);
       const audioFile = new File([audioBuffer], 'audio.webm', { type: audioType });
@@ -66,14 +66,18 @@ workQueue.process(async (job) => {
       });
   
       const chatGPTData = await chatGPTResponse.json();
-      const message = chatGPTData.choices && chatGPTData.choices.length > 0 ? chatGPTData.choices[0].message.content.trim() : '';
+      console.log('ChatGPT API response:', JSON.stringify(chatGPTData));
   
-      // Insert into the database
-      await db.none(
-        'INSERT INTO vetwriter(user_id, patient_name, transcription, reply, content, timestamp) VALUES($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)',
-        [userId, patientName, transcription, message, requestBody.messages[0].content]
-      );
+      // Extract the completion
+      const completion = chatGPTData.choices && chatGPTData.choices.length > 0 ? chatGPTData.choices[0].message.content.trim() : '';
+  
+      // Save the completion in the database
+      await db.none('INSERT INTO vetwriter(user_id, patient_name, transcription, reply) VALUES($1, $2, $3, $4)', [userId, patientName, transcription, completion]);
+  
+      console.log('Job completed:', job);
     } catch (error) {
+      console.error('Error processing job:', job);
       console.error('Error:', error);
     }
-});
+  });
+  

@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
+    "worker": "node worker.js",
     "heroku-postbuild": "npm rebuild bcrypt --build-from-source"
   },
   "keywords": [],
