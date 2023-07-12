@@ -10,8 +10,8 @@ import path from 'path';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import cookieParser from 'cookie-parser';
-import Queue from 'bull';
 import workQueue from './queue.mjs';
+import AWS from 'aws-sdk';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -21,6 +21,13 @@ const API_KEY = process.env.OPENAI_API_KEY;
 const app = express();
 const port = process.env.PORT || 3000;
 const host = process.env.HOST || 'http://localhost';
+
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+});
+
+const s3 = new AWS.S3();
 
 const upload = multer({ storage: multer.memoryStorage() });
 app.use(express.json());
@@ -63,19 +70,37 @@ app.use(async (req, res, next) => {
   next();
 });
 
+async function uploadFileToS3(fileBuffer, fileName) {
+  const params = {
+    Bucket: process.env.BUCKETEER_BUCKET_NAME,
+    Key: fileName,
+    Body: fileBuffer
+  };
+
+  return new Promise((resolve, reject) => {
+    s3.upload(params, function(err, data) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data.Location);
+      }
+    });
+  });
+}
+
 app.post('/whisper/asr', upload.single('audio'), async (req, res) => {
   const patientName = req.query.patientName; // Extract patient name from query parameters
   const audioBuffer = Buffer.from(req.file.buffer);
 
   // Save the converted audio file to disk
-  const outputFilePath = path.join(__dirname, `output_${uuidv4()}.webm`);
-  await fs.writeFile(outputFilePath, audioBuffer);
+  const fileName = `output_${uuidv4()}.webm`;
+  const audioFileUrl = await uploadFileToS3(audioBuffer, fileName);
 
   const job = await workQueue.add({
     userId: req.user.id,
     patientName: patientName,
     model: 'whisper-1',
-    audioFilePath: outputFilePath,
+    audioFileUrl: audioFileUrl,
     audioType: 'audio/webm'
   });
 
