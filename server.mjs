@@ -95,9 +95,6 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 
-
-const s3 = new AWS.S3();
-
 app.post('/whisper/asr', upload.single('audio'), async (req, res) => {
   const patientName = req.query.patientName; // Extract patient name from query parameters
   const audioBuffer = Buffer.from(req.file.buffer);
