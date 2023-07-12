@@ -80,6 +80,7 @@ async function uploadFileToS3(fileBuffer, fileName) {
   return new Promise((resolve, reject) => {
     s3.upload(params, function(err, data) {
       if (err) {
+        console.error(err); // this line will print more details about the error
         reject(err);
       } else {
         resolve(data.Location);
