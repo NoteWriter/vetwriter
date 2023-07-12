@@ -20,7 +20,7 @@ AWS.config.update({
     }
   });
   
-  const s3 = new AWS.S3();
+const s3 = new AWS.S3();
 
 async function downloadFileFromS3(fileName) {
     const params = {
@@ -66,9 +66,10 @@ const connection = {
 const db = pgp(connection);
 
 workQueue.process(async (job) => {
+  try {
     const { userId, patientName, model, audioFileUrl, audioType } = job.data;
     const fileName = path.basename(audioFileUrl);
-    
+
     let audioBuffer;
     try {
       audioBuffer = await downloadFileFromS3(fileName);
@@ -92,7 +93,7 @@ workQueue.process(async (job) => {
       });
   
       if (!whisperResponse.ok) {
-          console.error('Whisper API request failed:', await whisperResponse.text
+          console.error('Whisper API request failed:', await whisperResponse.text())
           // your remaining error handling code
       }
   
@@ -123,7 +124,7 @@ workQueue.process(async (job) => {
       });
   
       if (!chatGPTResponse.ok) {
-          console.error('ChatGPT API request failed:', await chatGPTResponse.text...
+          console.error('ChatGPT API request failed:', await chatGPTResponse.text())
           // your remaining error handling code
       }
   
@@ -138,18 +139,12 @@ workQueue.process(async (job) => {
           throw error;
       }
   
+      await deleteFileFromS3(fileName);
     } catch (error) {
-      console.error('Error processing job:', error);
-      throw error;
-    }
-    
-        await deleteFileFromS3(fileName);
-    } catch (error) {
-        console.error('Error processing job:', job);
-        console.error('Error:', error);
-        // You might want to consider re-throwing the error after logging.
-        // This would cause the job to fail and could be retried if your queue supports it.
-        // throw error;
+      console.error('Error processing job:', job);
+      console.error('Error:', error);
+      // You might want to consider re-throwing the error after logging.
+      // This would cause the job to fail and could be retried if your queue supports it.
+      // throw error;
     }
 });
-
