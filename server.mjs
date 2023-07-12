@@ -82,16 +82,19 @@ async function uploadFileToS3(fileBuffer, fileName) {
   });
 }
 
-console.log('BUCKETEER_AWS_ACCESS_KEY_ID:', process.env.AWS_ACCESS_KEY_ID);
-console.log('BUCKETEER_AWS_SECRET_ACCESS_KEY:', process.env.AWS_SECRET_ACCESS_KEY);
+console.log('BUCKETEER_AWS_ACCESS_KEY_ID:', process.env.BUCKETEER_AWS_ACCESS_KEY_ID);
+console.log('BUCKETEER_AWS_SECRET_ACCESS_KEY:', process.env.BUCKETEER_AWS_SECRET_ACCESS_KEY);
 
 AWS.config.update({
   region: process.env.BUCKETEER_AWS_REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    accessKeyId: process.env.BUCKETEER_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.BUCKETEER_AWS_SECRET_ACCESS_KEY
   }
 });
+
+const s3 = new AWS.S3();
+
 
 const s3 = new AWS.S3();
 
