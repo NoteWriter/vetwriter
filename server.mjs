@@ -108,13 +108,6 @@ app.post('/whisper/asr', upload.single('audio'), async (req, res) => {
     audioType: 'audio/webm'
   });
 
-  // Create entry in vetwriter table
-  try {
-    await db.none('INSERT INTO vetwriter(user_id, patient_name, transcription) VALUES($1, $2, $3)', [req.user.id, patientName, null]);
-  } catch (error) {
-    console.error('Error inserting into the database:', error);
-  }
-
   res.json({ jobId: job.id });
   console.log('Job created:', job);
 });
@@ -156,13 +149,6 @@ app.post('/chatgpt', async (req, res) => {
     const data = await response.json();
     const message = data.choices && data.choices.length > 0 ? data.choices[0].message.content.trim() : '';
     
-    // Update database entry with reply and content
-    try {
-      await db.none('UPDATE vetwriter SET reply = $1, content = $2 WHERE transcription IS NULL AND user_id = $3', [message, requestBody.messages[0].content, req.user.id]);
-      res.json({ reply: message });
-    } catch (error) {
-      throw new Error('Error updating the database');
-    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
