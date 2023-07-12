@@ -13,49 +13,14 @@ const pgp = pgPromise({
 });
 
 AWS.config.update({
-    region: process.env.BUCKETEER_AWS_REGION,
-    credentials: {
-      accessKeyId: process.env.BUCKETEER_AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.BUCKETEER_AWS_SECRET_ACCESS_KEY
-    }
-  });
-  
+  region: process.env.BUCKETEER_AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.BUCKETEER_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.BUCKETEER_AWS_SECRET_ACCESS_KEY
+  }
+});
+
 const s3 = new AWS.S3();
-
-async function downloadFileFromS3(fileName) {
-    const params = {
-      Bucket: process.env.BUCKETEER_BUCKET_NAME,
-      Key: fileName
-    };
-  
-    return new Promise((resolve, reject) => {
-      s3.getObject(params, function(err, data) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(data.Body);
-        }
-      });
-    });
-}
-
-async function deleteFileFromS3(fileName) {
-    const params = {
-      Bucket: process.env.BUCKETEER_BUCKET_NAME,
-      Key: fileName
-    };
-  
-    return new Promise((resolve, reject) => {
-      s3.deleteObject(params, function(err, data) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-    });
-}
-
 const connection = {
   connectionString: process.env.DATABASE_URL,
   ssl: {
@@ -65,18 +30,35 @@ const connection = {
 
 const db = pgp(connection);
 
-workQueue.process(async (job) => {
-  try {
-    const { userId, patientName, model, audioFileUrl, audioType } = job.data;
-    const fileName = path.basename(audioFileUrl);
+const handleS3Operation = (action, fileName) => new Promise((resolve, reject) => {
+  const params = {
+    Bucket: process.env.BUCKETEER_BUCKET_NAME,
+    Key: fileName
+  };
 
-    let audioBuffer;
-    try {
-      audioBuffer = await downloadFileFromS3(fileName);
-    } catch (error) {
-      console.error('Error downloading file from S3:', fileName, error);
-      throw error;
+  s3[action](params, function(err, data) {
+    if (err) {
+      reject(err);
+    } else {
+      resolve(action === 'getObject' ? data.Body : undefined);
     }
+  });
+});
+
+const deleteFileFromS3 = fileName => handleS3Operation('deleteObject', fileName);
+const downloadFileFromS3 = fileName => handleS3Operation('getObject', fileName);
+
+workQueue.process(async (job) => {
+  const { userId, patientName, model, audioFileUrl, audioType } = job.data;
+  const fileName = path.basename(audioFileUrl);
+  let audioBuffer;
+
+  try {
+    audioBuffer = await downloadFileFromS3(fileName);
+  } catch (error) {
+    console.error('Error downloading file from S3:', fileName, error);
+    throw error;
+  }
   
     try {
       const audioFile = new File([audioBuffer], 'audio.webm', { type: audioType });
@@ -138,13 +120,12 @@ workQueue.process(async (job) => {
           console.error('Error inserting into the database:', error);
           throw error;
       }
-  
-      await deleteFileFromS3(fileName);
+      try {
+        await deleteFileFromS3(fileName);
+      } catch (error) {
+        console.error('Error:', error);
+      }
     } catch (error) {
-      console.error('Error processing job:', job);
-      console.error('Error:', error);
-      // You might want to consider re-throwing the error after logging.
-      // This would cause the job to fail and could be retried if your queue supports it.
-      // throw error;
+      console.error('Error in processing job:', error);
     }
 });
