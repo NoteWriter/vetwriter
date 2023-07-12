@@ -82,9 +82,6 @@ async function uploadFileToS3(fileBuffer, fileName) {
   });
 }
 
-console.log('BUCKETEER_AWS_ACCESS_KEY_ID:', process.env.BUCKETEER_AWS_ACCESS_KEY_ID);
-console.log('BUCKETEER_AWS_SECRET_ACCESS_KEY:', process.env.BUCKETEER_AWS_SECRET_ACCESS_KEY);
-
 AWS.config.update({
   region: process.env.BUCKETEER_AWS_REGION,
   credentials: {
@@ -111,9 +108,17 @@ app.post('/whisper/asr', upload.single('audio'), async (req, res) => {
     audioType: 'audio/webm'
   });
 
+  // Create entry in vetwriter table
+  try {
+    await db.none('INSERT INTO vetwriter(user_id, patient_name, transcription) VALUES($1, $2, $3)', [req.user.id, patientName, null]);
+  } catch (error) {
+    console.error('Error inserting into the database:', error);
+  }
+
   res.json({ jobId: job.id });
   console.log('Job created:', job);
 });
+
 
 
 const startWorker = (id) => {
@@ -153,7 +158,7 @@ app.post('/chatgpt', async (req, res) => {
     
     // Update database entry with reply and content
     try {
-      await db.none('UPDATE vetwriter SET reply = $1, content = $2 WHERE transcription = $3 AND user_id = $4', [message, requestBody.messages[0].content, userMessage, req.user.id]);
+      await db.none('UPDATE vetwriter SET reply = $1, content = $2 WHERE transcription IS NULL AND user_id = $3', [message, requestBody.messages[0].content, req.user.id]);
       res.json({ reply: message });
     } catch (error) {
       throw new Error('Error updating the database');
