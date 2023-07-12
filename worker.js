@@ -68,54 +68,80 @@ const db = pgp(connection);
 workQueue.process(async (job) => {
     const { userId, patientName, model, audioFileUrl, audioType } = job.data;
     const fileName = path.basename(audioFileUrl);
-    const audioBuffer = await downloadFileFromS3(fileName);
-  
+    
+    let audioBuffer;
     try {
-      const audioFile = new File([audioBuffer], 'audio.webm', { type: audioType });
-      const form = new FormData();
-      form.append('file', audioFile);
-      form.append('model', model);
-  
-      const whisperResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${API_KEY}`,
-        },
-        body: form,
-      });
-  
-      const whisperData = await whisperResponse.json();
-  
-      const transcription = whisperData.text; // Extract the transcription
-  
-      const requestBody = {
-        model: 'gpt-3.5-turbo-16k',
-        messages: [
-          {
-            role: 'user',
-            content: transcription,
-          },
-        ],
-      };
-  
-      const chatGPTResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      });
-  
-      const chatGPTData = await chatGPTResponse.json();
-  
-      const completion = chatGPTData.choices && chatGPTData.choices.length > 0 ? chatGPTData.choices[0].message.content.trim() : '';
-  
-      await db.none('INSERT INTO vetwriter(user_id, patient_name, transcription, reply) VALUES($1, $2, $3, $4)', [userId, patientName, transcription, completion]);
-  
-      await deleteFileFromS3(fileName);
+        audioBuffer = await downloadFileFromS3(fileName);
     } catch (error) {
-      console.error('Error processing job:', job);
-      console.error('Error:', error);
+        console.error('Error downloading file from S3:', fileName, error);
+        throw error;
+    }
+
+    try {
+        const audioFile = new File([audioBuffer], 'audio.webm', { type: audioType });
+        const form = new FormData();
+        form.append('file', audioFile);
+        form.append('model', model);
+    
+        const whisperResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${API_KEY}`,
+            },
+            body: form,
+        });
+    
+        if (!whisperResponse.ok) {
+            console.error('Whisper API request failed:', await whisperResponse.text());
+            throw new Error('Whisper API request failed');
+        }
+
+        const whisperData = await whisperResponse.json();
+    
+        const transcription = whisperData.text;
+    
+        const requestBody = {
+            model: 'gpt-3.5-turbo-16k',
+            messages: [
+                {
+                    role: 'user',
+                    content: transcription,
+                },
+            ],
+        };
+    
+        const chatGPTResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+        });
+
+        if (!chatGPTResponse.ok) {
+            console.error('GPT API request failed:', await chatGPTResponse.text());
+            throw new Error('GPT API request failed');
+        }
+    
+        const chatGPTData = await chatGPTResponse.json();
+    
+        const completion = chatGPTData.choices && chatGPTData.choices.length > 0 ? chatGPTData.choices[0].message.content.trim() : '';
+    
+        try {
+            await db.none('INSERT INTO vetwriter(user_id, patient_name, transcription, reply) VALUES($1, $2, $3, $4)', [userId, patientName, transcription, completion]);
+        } catch (error) {
+            console.error('Database insertion failed:', error);
+            throw error;
+        }
+    
+        await deleteFileFromS3(fileName);
+    } catch (error) {
+        console.error('Error processing job:', job);
+        console.error('Error:', error);
+        // You might want to consider re-throwing the error after logging.
+        // This would cause the job to fail and could be retried if your queue supports it.
+        // throw error;
     }
 });
+
