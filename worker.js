@@ -82,6 +82,8 @@ workQueue.process(async (job) => {
       const whisperData = await whisperResponse.json();
       const transcription = whisperData.transcription;
 
+      console.log('Whisper data:', whisperData);
+
       // Check if transcription is valid
 if (!transcription || transcription === '') {
     console.error('Transcription is missing or invalid:', transcription);
