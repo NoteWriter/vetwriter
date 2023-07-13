@@ -82,6 +82,12 @@ workQueue.process(async (job) => {
       const whisperData = await whisperResponse.json();
       const transcription = whisperData.transcription;
 
+      // Check if transcription is valid
+if (!transcription || transcription === '') {
+    console.error('Transcription is missing or invalid:', transcription);
+    return;  // halt execution
+  }
+
       const requestBody = {
         model: 'gpt-3.5-turbo-16k',
         messages: [
@@ -104,14 +110,15 @@ workQueue.process(async (job) => {
         },
         body: JSON.stringify(requestBody),
       });
-  
-      if (!chatGPTResponse.ok) {
-          console.error('ChatGPT API request failed:', await chatGPTResponse.text())
-      }
-  
+      
       const chatGPTData = await chatGPTResponse.json();
-      const message = chatGPTData.choices && chatGPTData.choices.length > 0 ? chatGPTData.choices[0].message.content.trim() : '';
-  
+      
+      if (!chatGPTResponse.ok) {
+        console.error('ChatGPT API request failed:', JSON.stringify(chatGPTData, null, 2))
+      } else {
+        const message = chatGPTData.choices && chatGPTData.choices.length > 0 ? chatGPTData.choices[0].message.content.trim() : '';
+      }
+     
       // Create entry in vetwriter table
       try {
           await db.none('INSERT INTO vetwriter(user_id, patient_name, transcription, reply) VALUES($1, $2, $3, $4)', [userId, patientName, transcription, message]);
